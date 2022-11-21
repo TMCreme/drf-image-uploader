@@ -1,0 +1,23 @@
+# Secrets config
+config.ini
+
+# .gitignore
+
+# pycache directories
+__pycache__
+
+# Environmental variables for running docker or compose
+.env
+
+
+# Images
+*.png
+*.jpg
+*.jpeg
+
+# SQLite Database
+db.sqlite3
+
+# Others
+.DS_Store
+extras.py

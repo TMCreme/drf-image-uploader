@@ -1,3 +1,4 @@
+from time import time
 from django.db import models
 from django.contrib.auth.models import (
     AbstractUser, AbstractBaseUser
@@ -10,14 +11,16 @@ from pathlib import Path
 import uuid
 from PIL import Image
 from io import BytesIO
-from datetime import datetime
+from django.utils import timezone
+from datetime import datetime, timedelta
 import os
+import shutil
 
 
 # The account tiers or plans to be given to users.
 class AccountTier(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
-    date_modified = models.DateField(auto_now=True)
+    date_modified = models.DateTimeField(auto_now=True)
     name = models.CharField(max_length=100, unique=True, db_index=True)
     display_link_to_original_image = models.BooleanField(default=False)
     generate_expiring_links = models.BooleanField(default=False)
@@ -29,7 +32,7 @@ class AccountTier(models.Model):
 # The thumbnails under a particular account tier.
 class ImageThumbnail(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
-    date_modified = models.DateField(auto_now=True)
+    date_modified = models.DateTimeField(auto_now=True)
     account_tier = models.ForeignKey(AccountTier, on_delete=models.CASCADE)
     height = models.CharField(
         max_length=5,
@@ -43,6 +46,7 @@ class User(AbstractUser):
         AccountTier, on_delete=models.PROTECT, null=True
         )
 
+    # This function is to hash password
     def save(self, *args, **kwargs):
         create = True if self.id is None else False
 
@@ -60,7 +64,7 @@ def get_upload_path(instance, filename):
 
 class UserImage(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
-    date_modified = models.DateField(auto_now=True)
+    date_modified = models.DateTimeField(auto_now=True)
     user = models.ForeignKey(User, on_delete=models.PROTECT)
     image_uuid = models.UUIDField(
         unique=True, db_index=True, default=uuid.uuid4, editable=False
@@ -80,18 +84,21 @@ class UserImage(models.Model):
 # thumbnail under the account tier
 class UserImageThumbnail(models.Model):
     date_created = models.DateTimeField(auto_now_add=True, db_index=True)
-    date_modified = models.DateField(auto_now=True)
+    date_modified = models.DateTimeField(auto_now=True)
     image = models.ImageField(upload_to=get_upload_path)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     thumbnail = models.ForeignKey(ImageThumbnail, on_delete=models.CASCADE)
     name = models.CharField(max_length=500)
-    original_image = models.ForeignKey(UserImage, on_delete=models.CASCADE)
+    original_image = models.ForeignKey(
+        UserImage, on_delete=models.CASCADE
+        )
 
     def __str__(self) -> str:
         return self.name
 
 
 # The function receives a signal to create the thumbnails
+# A more scalable approach will be to use django-celery
 @receiver(post_save, sender=UserImage)
 def create_thumbnail(sender, instance, **kwargs):
     account_tier = instance.user.account_tier
@@ -126,6 +133,11 @@ def create_thumbnail(sender, instance, **kwargs):
         userthumbnail.image = image_name + "." + img_name_split[-1]
         userthumbnail.save()
         os.remove(image_name + "." + img_name_split[-1])
+
+
+
+
+
 
 
 

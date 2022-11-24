@@ -9,9 +9,19 @@ urlpatterns = [
         views.UserImageListView.as_view(),
         name="api-list-images"),
     path(
-        "api-create-image/",
+        "api-upload-image/",
         views.UserImageCreateView.as_view(),
-        name="api-create-image"
+        name="api-upload-image"
+    ),
+    path(
+        "api-list-image-thumbnail/",
+        views.UserImageThumbnailListView.as_view(),
+        name="api-list-image-thumbnail"
+    ),
+    path(
+        "api-generate-temp-link/",
+        views.GenerateTempLink.as_view(),
+        name="api-generate-temp-link"
     )
 ]
 

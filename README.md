@@ -24,6 +24,7 @@ User management is handled in the admin UI. A user is created, and assigned a pa
 * Visit the admin page on `http://localhost:9010/admin`
 * List images `http://localhost:9010/home/api-list-images`
 * Post Images `http://localhost:9010/home/api-upload-image/`
+* List Thumbnails `http://localhost:9010/home/api-api-list-image-thumbnail/`
 * Generate Temp Link `http://localhost:9010/home/api-generate-temp-link/`
 
 ## RUNNING DOCKER COMPOSE 
@@ -51,8 +52,16 @@ User management is handled in the admin UI. A user is created, and assigned a pa
     ```
 * Build and start with the following command `docker-compose up -d --build` 
 * Once the container(s) is/are up, run the following to create a super user to use for the admin `docker-compose exec web python manage.py createsuperuser`. The command will prompt you with the details of the user. 
-* Visit the admin site on `http://localhost:9010/admin` and the APIs on `http://localhost:9010/home/api-list-images`, `http://localhost:9010/home/api-upload-image/` and `http://localhost:9010/home/api-generate-temp-link/`
-
+* Visit the admin site on `http://localhost:9010/admin` and the APIs on `http://localhost:9010/home/api-list-images`, `http://localhost:9010/home/api-upload-image/`, `http://localhost:9010/home/api-api-list-image-thumbnail/` and `http://localhost:9010/home/api-generate-temp-link/`
+* To run the `Generate Temp Link` API, the body should contain the following, 
+```
+{
+    "image_id": 2,
+    "alive_duration": 300
+}
+```
+ - The `image_id` is the ID in the response of `List Images` API. 
+ - The `alive_duration` specifies the time in seconds, after which the link expires. 
 
 ## DEPLOYMENT WITH DOCKER
 * Not implemented

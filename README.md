@@ -23,12 +23,39 @@ User management is handled in the admin UI. A user is created, and assigned a pa
 * Run the webserver locally `python manage.py runserver`. This defaults to port 8080. If port 8080 is in use by another application or you wish to run on a different port, run the following `python manage.py runserver 0.0.0.0:9010` to run on port 9010 or any other you choose
 * Visit the admin page on `http://localhost:9010/admin`
 * List images `http://localhost:9010/home/api-list-images`
-* Post Images `http://localhost:9010/home/api-create-image/`
+* Post Images `http://localhost:9010/home/api-upload-image/`
+* Generate Temp Link `http://localhost:9010/home/api-generate-temp-link/`
 
 ## RUNNING DOCKER COMPOSE 
-* Not implemented yet
+* To run with docker compose, clone the project to a local environment 
+* Create a `.env` file in the root directory of the project with the following 
+    - SECRET_KEY=
+    - DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]
+    - SQL_ENGINE=django.db.backends.postgresql
+    - SQL_DATABASE=postgres
+    - SQL_USER=postgres
+    - SQL_PASSWORD=postgres
+    - SQL_HOST=db
+    - SQL_PORT=5432 
+
+* Also have a `config.ini` file in the same location as the settings.py with the following
+    ```
+    [MAIN_SETTINGS]
+    secret_key=xxxxxxxxxxxxxxxxx
+
+    [AWS_CREDENTIALS]
+    AWS_ACCESS_KEY_ID=xxxxxxxxxxxxxxxx
+    AWS_SECRET_ACCESS_KEY=xxxxxxxxxxxxxxxxxxx
+    AWS_STORAGE_BUCKET_NAME=xxxxxxxxxxxxxx
+    AWS_DEFAULT_ACL = None
+    ```
+* Build and start with the following command `docker-compose up -d --build` 
+* Once the container(s) is/are up, run the following to create a super user to use for the admin `docker-compose exec web python manage.py createsuperuser`. The command will prompt you with the details of the user. 
+* Visit the admin site on `http://localhost:9010/admin` and the APIs on `http://localhost:9010/home/api-list-images`, `http://localhost:9010/home/api-upload-image/` and `http://localhost:9010/home/api-generate-temp-link/`
+
 
 ## DEPLOYMENT WITH DOCKER
 * Not implemented
 
-## EXTRAS
+## RECOMMENDATION
+Since this is a mini project, I implemented a function in the models that creates the thumbnails. A more scalable approach will be to use django-celery tasks. 

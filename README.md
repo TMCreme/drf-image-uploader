@@ -1,4 +1,4 @@
-# DJANGO MINI PROJECT - MICHAL WILKOSZ
+# DJANGO MINI PROJECT - Image Uploads
 
 ## INTRODUCTION 
 This project has exposes 3 major APIs

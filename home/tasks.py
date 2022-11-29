@@ -1,5 +1,4 @@
 from django.core.files import File
-from django.core import serializers
 import celery
 from celery import shared_task
 from celery.utils.log import get_task_logger
@@ -8,7 +7,6 @@ from pathlib import Path
 from io import BytesIO
 import os
 from PIL import Image
-import json
 
 from .models import (
     ImageThumbnail, UserImageThumbnail,
@@ -20,10 +18,7 @@ logger = get_task_logger(__name__)
 
 @shared_task
 def create_thumbnail_task(instance):
-    logger.debug("Received the call from the signal")
     logger.debug(instance)
-    # instance = serializers.deserialize('json', instance)
-    # logger.debug(instance)
     instance = UserImage.objects.get(id=int(instance))
     account_tier = instance.user.account_tier
     new_image = Image.open(instance.image)
@@ -31,7 +26,7 @@ def create_thumbnail_task(instance):
         account_tier=account_tier
         ).values('id', 'height')
     logger.debug("Starting the creation of thumbnails")
-    print("Starting the creation of thumbnails")
+    logger.info("Starting the creation of thumbnails")
     for item in height_list:
         image_name = "{}/{}_{}_{}_{}_{}".format(
             "media",
@@ -50,7 +45,7 @@ def create_thumbnail_task(instance):
                 image_name + "."+ img_name_split[-1],
                 file_object
             ),
-        print("Image thumbnail creation done")
+        logger.info("Image thumbnail creation done")
         userthumbnail = UserImageThumbnail.objects.create(
             name=image_name[6:] + "." + img_name_split[-1],
             thumbnail=ImageThumbnail.objects.get(id=item['id']),

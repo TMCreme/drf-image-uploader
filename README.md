@@ -14,6 +14,8 @@ All other functionality is handled in the django admin UI.
 The project at a higher level, allows uses to upload images through the Django Rest Framework UI, list images under the user including links to the various images listed under the user. 
 User management is handled in the admin UI. A user is created, and assigned a particular account tier or Plan. Under the plan associated with the user are various image types the user can access. 
 
+When a user uploads an image, depending on the Plan/Account Tier associated with the user, the original image is resized into various dimensions as specified un the Plan/Account Tier. This task is dedicated to Celery and runs in the background. Hence any failure does not affect the main upload by the user. The function exists in `home/tasks.py`. 
+
 ## RUNNING LOCALLY 
 * Clone the project 
 * Create a virtualenv environment locally 
